@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMAKAI Scratch Card</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 360px;
+            width: 100%;
+        }
+        .scratch-card {
+            width: 100%;
+            background-color: #1a1a1a;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+            color: #f0f0f0;
+            border: 2px solid #FF6600;
+        }
+        .card-header {
+            position: relative;
+            background-color: #FF6600;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            background-image: linear-gradient(45deg, #FF6600 25%, transparent 25%, transparent 50%, #FF6600 50%, #FF6600 75%, transparent 75%, transparent);
+            background-size: 10px 10px;
+        }
+        .card-header:after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background-image: repeating-linear-gradient(45deg, #FF6600, #FF6600 10px, transparent 10px, transparent 20px);
+        }
+        .card-title {
+            font-size: 26px;
+            margin: 0;
+            font-weight: bold;
+            font-family: 'Impact', sans-serif;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0 #000;
+        }
+        .card-subtitle {
+            font-size: 14px;
+            margin: 5px 0 0;
+            font-style: italic;
+        }
+        .scratch-area {
+            position: relative;
+            height: 180px;
+            margin: 25px 15px 15px;
+            border: 3px solid #FF6600;
+            border-radius: 5px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #221a12;
+            touch-action: none; /* Prevent scrolling when scratching on mobile */
+        }
+        .prize {
+            text-align: center;
+            padding: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #FF6600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none" stroke="%23FF6600" stroke-width="2"/><path d="M30,30 L70,70 M30,70 L70,30" stroke="%23FF6600" stroke-width="2"/></svg>');
+            background-size: 20px 20px;
+            background-repeat: repeat;
+        }
+        .prize-content {
+            background-color: rgba(34, 26, 18, 0.9);
+            padding: 15px;
+            border-radius: 5px;
+            width: 80%;
+            border: 1px solid #FF6600;
+        }
+        .instructions {
+            text-align: center;
+            padding: 15px;
+            border-top: 1px dashed #FF6600;
+            font-size: 12px;
+            color: #aaa;
+        }
+        .logo {
+            width: 90px;
+            height: 90px;
+            background-color: #221a12;
+            border: 3px solid #FF6600;
+            color: #FF6600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 0 auto 10px;
+            position: relative;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .logo:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="%23FF6600" stroke-width="2"/><path d="M25,50 L75,50 M50,25 L50,75" stroke="%23FF6600" stroke-width="2"/></svg>');
+            background-size: cover;
+            opacity: 0.15;
+        }
+        .logo-text {
+            position: relative;
+            z-index: 1;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+            font-family: 'Impact', sans-serif;
+            letter-spacing: 1px;
+            font-size: 22px;
+        }
+        .prizes-list {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .prize-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            background-color: #221a12;
+            border: 2px solid #FF6600;
+            color: #FF6600;
+            text-align: center;
+            padding: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .prize-icon:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 50% 50%, #FF8033 0%, transparent 70%);
+            opacity: 0.2;
+        }
+        .lanterns {
+            position: absolute;
+            top: -10px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+        }
+        .lantern {
+            width: 20px;
+            height: 30px;
+            background-color: #FF6600;
+            border-radius: 50% 50% 5px 5px;
+            position: relative;
+        }
+        .lantern:before {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 5px;
+            background-color: #FF6600;
+            border-radius: 0 0 5px 5px;
+        }
+        .japanese-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><path d="M0,20 Q10,0 20,20 T40,20 M20,0 Q20,10 40,20 T20,40 T0,20" fill="none" stroke="%23FF6600" stroke-width="0.5" opacity="0.3"/></svg>');
+            background-size: 40px 40px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        /* Canvas overlay for scratch effect */
+        #scratch-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 20;
+        }
+        
+        /* Current date and time display */
+        .current-datetime {
+            text-align: center;
+            color: #FF6600;
+            font-size: 14px;
+            margin-top: 5px;
+            background-color: rgba(34, 26, 18, 0.6);
+            padding: 5px;
+            border-radius: 3px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        #reset-link {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #999;
+            text-decoration: none;
+        }
+        
+        .scratch-instructions {
+            position: absolute;
+            z-index: 21;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        /* Remaining winners counter */
+        .remaining-counter {
+            text-align: center;
+            color: #FF6600;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 5px;
+            background-color: rgba(34, 26, 18, 0.6);
+            padding: 5px;
+            border-radius: 3px;
+        }
+        
+        /* Time restriction message */
+        .time-restriction {
+            background-color: #1a1a1a;
+            border: 2px solid #FF6600;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .time-restriction .japanese-pattern {
+            opacity: 0.05;
+        }
+        .time-restriction h2 {
+            color: #FF6600;
+            font-family: 'Impact', sans-serif;
+            letter-spacing: 1px;
+            margin-top: 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+        #timer {
+            font-size: 36px;
+            font-weight: bold;
+            color: #FF6600;
+            margin: 15px 0;
+            font-family: monospace;
+            text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Game card -->
+        <div class="scratch-card" id="gameCard">
+            <div class="japanese-pattern"></div>
+            <div class="card-header">
+                <div class="logo">
+                    <span class="logo-text">UMAKAI</span>
+                </div>
+                <h1 class="card-title">TRY YOUR LUCK</h1>
+                <p class="card-subtitle">SCRATCH & WIN</p>
+                <div class="current-datetime" id="currentDateTime">Loading date...</div>
+                <div class="remaining-counter" id="winnerCounter">Loading...</div>
+            </div>
+            
+            <div class="lanterns">
+                <div class="lantern"></div>
+                <div class="lantern"></div>
+                <div class="lantern"></div>
+            </div>
+            
+            <div class="scratch-area" id="scratch-area">
+                <div id="prize" class="prize">
+                    <div class="prize-content">
+                        <div>🎉 CONGRATULATIONS! 🎉</div>
+                        <div id="prize-name" style="font-size: 20px; color: #FF6600; margin: 10px 0;">SKEWER ASSORTMENT</div>
+                    </div>
+                </div>
+                <canvas id="scratch-canvas"></canvas>
+                <div id="scratch-instructions" class="scratch-instructions">
+                    Scratch here to reveal prize
+                </div>
+            </div>
+            
+            <div class="prizes-list">
+                <div class="prize-icon">UMAKAI<br>T-shirt</div>
+                <div class="prize-icon">UMACAN<br>Drink</div>
+                <div class="prize-icon">Yakitori<br>Skewers</div>
+            </div>
+            
+            <div class="instructions">
+                Present this card to your server to claim your prize.<br>
+                Limited to 2 winners per hour.
+            </div>
+        </div>
+        
+        <!-- Time restriction message -->
+        <div class="time-restriction hidden" id="timeRestriction">
+            <div class="japanese-pattern"></div>
+            <div class="logo">
+                <span class="logo-text">UMAKAI</span>
+            </div>
+            <div class="current-datetime" id="currentDateTimeRestricted">Loading date...</div>
+            <h2>All prizes claimed for this hour!</h2>
+            <p>You can play again in:</p>
+            <div id="timer">00:00:00</div>
+            <p>Maximum 2 winners per hour.</p>
+            <div class="prizes-list">
+                <div class="prize-icon">UMAKAI<br>T-shirt</div>
+                <div class="prize-icon">UMACAN<br>Drink</div>
+                <div class="prize-icon">Yakitori<br>Skewers</div>
+            </div>
+        </div>
+        
+        <!-- Admin Reset Link -->
+        <a href="#" id="reset-link">Reset</a>
+    </div>
+
+    <script>
+        // Wait for page to load
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const gameCard = document.getElementById('gameCard');
+            const timeRestriction = document.getElementById('timeRestriction');
+            const scratchArea = document.getElementById('scratch-area');
+            const canvas = document.getElementById('scratch-canvas');
+            const prizeName = document.getElementById('prize-name');
+            const currentDateTime = document.getElementById('currentDateTime');
+            const currentDateTimeRestricted = document.getElementById('currentDateTimeRestricted');
+            const resetLink = document.getElementById('reset-link');
+            const scratchInstructions = document.getElementById('scratch-instructions');
+            const winnerCounter = document.getElementById('winnerCounter');
+            const timerElement = document.getElementById('timer');
+            
+            // Set up canvas
+            const ctx = canvas.getContext('2d');
+            
+            // Constants
+            const MAX_WINNERS_PER_HOUR = 2;
+            
+            // Prizes
+            const prizes = [
+                "UMAKAI T-SHIRT",
+                "UMACAN DRINK",
+                "SKEWER ASSORTMENT"
+            ];
+            
+            // Scratch card variables
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+            let percentScratched = 0;
+            const requiredScratchPercent = 50; // Required scratch percentage to reveal prize
+            let prizeRevealed = false;
+            
+            // Get current hour key (format: YYYY-MM-DD-HH)
+            function getCurrentHourKey() {
+                const now = new Date();
+                return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}-${now.getHours().toString().padStart(2, '0')}`;
+            }
+            
+            // Get winners count for current hour
+            function getCurrentHourWinnersCount() {
+                const hourKey = getCurrentHourKey();
+                return parseInt(localStorage.getItem(`umakai_winners_${hourKey}`) || '0');
+            }
+            
+            // Increment winners count for current hour
+            function incrementWinnersCount() {
+                const hourKey = getCurrentHourKey();
+                const currentCount = getCurrentHourWinnersCount();
+                localStorage.setItem(`umakai_winners_${hourKey}`, (currentCount + 1).toString());
+            }
+            
+            // Check if we can have more winners this hour
+            function canHaveMoreWinners() {
+                return getCurrentHourWinnersCount() < MAX_WINNERS_PER_HOUR;
+            }
+            
+            // Update winners counter display
+            function updateWinnerCounter() {
+                const currentCount = getCurrentHourWinnersCount();
+                const remaining = MAX_WINNERS_PER_HOUR - currentCount;
+                winnerCounter.textContent = `${remaining} of ${MAX_WINNERS_PER_HOUR} prizes available this hour`;
+            }
+            
+            // Update date and time display
+            function updateDateTime() {
+                const now = new Date();
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                const formattedDate = now.toLocaleDateString('en-US', options);
+                
+                // Update both date displays
+                currentDateTime.textContent = formattedDate;
+                currentDateTimeRestricted.textContent = formattedDate;
+                
+                // Check if we've moved to a new hour
+                checkHourChange();
+                
+                // Update winners counter
+                updateWinnerCounter();
+            }
+            
+            // Check if we've moved to a new hour
+            function checkHourChange() {
+                const lastCheckedHour = localStorage.getItem('umakai_lastCheckedHour');
+                const currentHourKey = getCurrentHourKey();
+                
+                // If we've moved to a new hour
+                if (lastCheckedHour && lastCheckedHour !== currentHourKey) {
+                    // We're in a new hour, check if we need to reload
+                    if (!canHaveMoreWinners()) {
+                        // We were out of winners last hour, but now we're in a new hour
+                        // So reload to show the game again
+                        location.reload();
+                    }
+                }
+                
+                // Update the last checked hour
+                localStorage.setItem('umakai_lastCheckedHour', currentHourKey);
+            }
+            
+            // Get time until next hour
+            function getTimeUntilNextHour() {
+                const now = new Date();
+                const nextHour = new Date(now);
+                
+                // Set to the next hour
+                nextHour.setHours(now.getHours() + 1, 0, 0, 0);
+                
+                // Calculate time difference in milliseconds
+                const diffMs = nextHour - now;
+                
+                // Convert to hours, minutes, seconds
+                const hours = Math.floor(diffMs / (1000 * 60 * 60));
+                const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+                
+                return {
+                    hours,
+                    minutes,
+                    seconds,
+                    formattedTime: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+                };
+            }
+            
+            // Update the timer
+            function updateTimer() {
+                const timeUntilNextHour = getTimeUntilNextHour();
+                timerElement.textContent = timeUntilNextHour.formattedTime;
+                
+                // If it's time for reset (all zeros), reload the page
+                if (timeUntilNextHour.hours === 0 && timeUntilNextHour.minutes === 0 && timeUntilNextHour.seconds === 0) {
+                    location.reload();
+                }
+            }
+            
+            // Get random prize
+            function getRandomPrize() {
+                const randomIndex = Math.floor(Math.random() * prizes.length);
+                return prizes[randomIndex];
+            }
+            
+            // Initialize canvas
+            function initCanvas() {
+                // Set canvas dimensions to match container
+                canvas.width = scratchArea.offsetWidth;
+                canvas.height = scratchArea.offsetHeight;
+                
+                // Fill with scratch-off color
+                ctx.fillStyle = '#FF6600';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Add pattern
+                createScratchPattern();
+            }
+            
+            // Create scratch pattern
+            function createScratchPattern() {
+                // Add scratch texture pattern
+                for (let i = 0; i < 1000; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const size = Math.random() * 3 + 1;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                    ctx.fill();
+                }
+                
+                // Add some scratch lines
+                for (let i = 0; i < 50; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const width = Math.random() * 30 + 10;
+                    const angle = Math.random() * Math.PI;
+                    
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate(angle);
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(-width/2, 0);
+                    ctx.lineTo(width/2, 0);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+                
+                // Add some highlight
+                const gradient = ctx.createRadialGradient(
+                    canvas.width / 2, canvas.height / 2, 10,
+                    canvas.width / 2, canvas.height / 2, canvas.width / 1.5
+                );
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+                gradient.addColorStop(1, 'rgba(255, 102, 0, 0)');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Add scratch text
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.fillText('SCRATCH HERE', canvas.width / 2, canvas.height / 2 - 15);
+            }
+            
+            // Draw scratch
+            function drawScratch(x, y) {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = 30;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                
+                lastX = x;
+                lastY = y;
+                
+                // Check scratch percentage
+                checkScratchPercentage();
+            }
+            
+            // Calculate what percentage has been scratched
+            function checkScratchPercentage() {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const pixelData = imageData.data;
+                let transparentPixels = 0;
+                
+                // Count transparent pixels (every 4th value is alpha)
+                for (let i = 3; i < pixelData.length; i += 4) {
+                    if (pixelData[i] < 50) { // If mostly transparent
+                        transparentPixels++;
+                    }
+                }
+                
+                // Calculate percentage
+                const totalPixels = canvas.width * canvas.height;
+                percentScratched = (transparentPixels / totalPixels) * 100;
+                
+                // If enough has been scratched, reveal the prize
+                if (percentScratched > requiredScratchPercent && !prizeRevealed) {
+                    revealPrize();
+                }
+                
+                // Fade out instructions as scratching progresses
+                scratchInstructions.style.opacity = Math.max(0, 1 - (percentScratched / 25));
+            }
+            
+            // Reveal prize
+            function revealPrize() {
+                prizeRevealed = true;
+                
+                // Increment winners count
+                incrementWinnersCount();
+                
+                // Show alert with prize
+                setTimeout(function() {
+                    const prize = prizeName.textContent;
+                    alert('Congratulations! You won: ' + prize);
+                    
+                    // Reload page to update counters
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                }, 500);
+                
+                // Prevent further interaction
+                canvas.onmousedown = null;
+                canvas.onmousemove = null;
+                canvas.onmouseup = null;
+                canvas.ontouchstart = null;
+                canvas.ontouchmove = null;
+                canvas.ontouchend = null;
+                
+                // Fade out remaining scratch overlay
+                let opacity = 1.0;
+                const fadeInterval = setInterval(function() {
+                    opacity -= 0.1;
+                    if (opacity <= 0) {
+                        clearInterval(fadeInterval);
+                        // Optionally remove canvas completely
+                        canvas.style.display = 'none';
+                    } else {
+                        canvas.style.opacity = opacity;
+                    }
+                }, 100);
+            }
+            
+            // Event handlers for mouse
+            function handleMouseDown(e) {
+                isDrawing = true;
+                [lastX, lastY] = [e.offsetX, e.offsetY];
+                drawScratch(lastX, lastY);
+            }
+            
+            function handleMouseMove(e) {
+                if (!isDrawing) return;
+                drawScratch(e.offsetX, e.offsetY);
+            }
+            
+            function handleMouseUp() {
+                isDrawing = false;
+            }
+            
+            // Event handlers for touch
+            function handleTouchStart(e) {
+                e.preventDefault();
+                isDrawing = true;
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                lastX = touch.clientX - rect.left;
+                lastY = touch.clientY - rect.top;
+                drawScratch(lastX, lastY);
+            }
+            
+            function handleTouchMove(e) {
+                e.preventDefault();
+                if (!isDrawing) return;
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                drawScratch(x, y);
+            }
+            
+            function handleTouchEnd(e) {
+                e.preventDefault();
+                isDrawing = false;
+            }
+            
+            // Clean up old hour counters
+            function cleanupOldCounters() {
+                const keys = Object.keys(localStorage);
+                const winnerKeys = keys.filter(key => key.startsWith('umakai_winners_'));
+                
+                const now = new Date();
+                const currentHourKey = getCurrentHourKey();
+                
+                // Keep only current hour and previous hour
+                winnerKeys.forEach(key => {
+                    if (key !== `umakai_winners_${currentHourKey}`) {
+                        // Extract hour from key
+                        const hourParts = key.replace('umakai_winners_', '').split('-');
+                        if (hourParts.length === 4) {
+                            const keyDate = new Date(
+                                parseInt(hourParts[0]), 
+                                parseInt(hourParts[1]) - 1, 
+                                parseInt(hourParts[2]), 
+                                parseInt(hourParts[3])
+                            );
+                            
+                            // If it's more than 2 hours old, remove it
+                            if ((now - keyDate) > (2 * 60 * 60 * 1000)) {
+                                localStorage.removeItem(key);
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Initialize game
+            function init() {
+                // Clean up old counters
+                cleanupOldCounters();
+                
+                // Update the date display
+                updateDateTime();
+                
+                // Update date every minute
+                setInterval(updateDateTime, 60000);
+                
+                // Check if we can have more winners this hour
+                if (canHaveMoreWinners()) {
+                    gameCard.classList.remove('hidden');
+                    timeRestriction.classList.add('hidden');
+                    
+                    // Set random prize
+                    const prize = getRandomPrize();
+                    prizeName.textContent = prize;
+                    
+                    // Initialize canvas
+                    initCanvas();
+                    
+                    // Set up mouse events
+                    canvas.addEventListener('mousedown', handleMouseDown);
+                    canvas.addEventListener('mousemove', handleMouseMove);
+                    canvas.addEventListener('mouseup', handleMouseUp);
+                    canvas.addEventListener('mouseout', handleMouseUp);
+                    
+                    // Set up touch events
+                    canvas.addEventListener('touchstart', handleTouchStart);
+                    canvas.addEventListener('touchmove', handleTouchMove);
+                    canvas.addEventListener('touchend', handleTouchEnd);
+                    
+                    // Handle window resize
+                    window.addEventListener('resize', function() {
+                        initCanvas();
+                    });
+                } else {
+                    // Show time restriction
+                    gameCard.classList.add('hidden');
+                    timeRestriction.classList.remove('hidden');
+                    
+                    // Update timer immediately and then every second
+                    updateTimer();
+                    setInterval(updateTimer, 1000);
+                }
+            }
+            
+            // Add reset functionality
+            resetLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm("Are you sure you want to reset the game?")) {
+                    // Get all localStorage keys
+                    const keys = Object.keys(localStorage);
+                    
+                    // Filter for umakai related keys
+                    const umakaiKeys = keys.filter(key => key.startsWith('umakai_'));
+                    
+                    // Remove all umakai related keys
+                    umakaiKeys.forEach(key => {
+                        localStorage.removeItem(key);
+                    });
+                    
+                    alert("Game reset complete. Reloading page...");
+                    location.reload();
+                }
+            });
+            
+            // Start the game
+            init();
+        });
+    </script>
+</body>
+</html>
